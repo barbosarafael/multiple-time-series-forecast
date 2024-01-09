@@ -38,7 +38,13 @@ O lado positivo dessa "última dificuldade" é que um Estado só pode estar dent
 
 ![teste](https://github.com/barbosarafael/multiple-time-series-forecast/assets/44044829/cb813600-7aef-4a8a-b0e4-4eefa698a039)
 
-### 2.2. Um pouquinho de teoria
+### 2.2. Um pouquinho de teoria (na prática)
+
+![image](https://github.com/barbosarafael/multiple-time-series-forecast/assets/44044829/8211ebe8-27c0-41e2-b33a-8a70da774157)
+
+De forma visual, a nossa hierarquia de variáveis pode ser representada da maneira acima. Obvio que não comportei todos os estados junto com todos os itens, pois não seria "desenhável". 
+
+Dessa forma fica um pouco mais fácil de visualizar as combinações que temos, junto com os níveis (região, estado e item).
 
 - reconciliação
 - tipos de reconciliação: bottomup, topdown e demais
