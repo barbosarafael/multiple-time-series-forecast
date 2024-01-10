@@ -42,9 +42,35 @@ O lado positivo dessa "última dificuldade" é que um Estado só pode estar dent
 
 ![image](https://github.com/barbosarafael/multiple-time-series-forecast/assets/44044829/8211ebe8-27c0-41e2-b33a-8a70da774157)
 
-De forma visual, a nossa hierarquia de variáveis pode ser representada da maneira acima. Obvio que não comportei todos os estados junto com todos os itens, pois não seria "desenhável". 
+De forma visual e resumida, a nossa hierarquia de variáveis pode ser representada da maneira acima.
 
-Dessa forma fica um pouco mais fácil de visualizar as combinações que temos, junto com os níveis (região, estado e item).
+Agora vamos supor que rodamos modelos para projetar as vendas para as séries, dentro de cada nível, isto é, vamos fazer as projeções para cada um dos valores que temos dentro dos níveis. Exemplos abaixo:
+
+- Nível I: SouthCentral
+- Nível II: SouthCentral/Vermont, SouthCentral/Maine e SouthCentral/Connecticut
+- Nivel III:
+  - SouthCentral/Vermont/Roupas Femininas, SouthCentral/Vermont/Roupas Masculinas e SouthCentral/Vermont/Roupas Infantil
+  - SouthCentral/Maine/Roupas Femininas, SouthCentral/Maine/Roupas Masculinas e SouthCentral/Maine/Roupas Infantil
+  - SouthCentral/Connecticut/Roupas Femininas, SouthCentral/Connecticut/Roupas Masculinas e SouthCentral/Connecticut/Roupas Infantil
+ 
+Infelizmente, na hora de agregar os valores nos níveis acima os valores não batem. Para o nosso caso, a soma das vendas projetadas do nível item (roupas femininas, masculinas e infantis) não será igual ao valor de vendas projetadas para o estado de Vermont. E assim sucessitivamente, até o maior nível.
+
+```python
+Y_hat_df\
+    .reset_index()\
+    .assign(\
+        nivel_hierarquia = lambda x: np.where(x['unique_id'].str.count('/') == 0, 1, x['unique_id'].str.count('/') + 1)
+    )\
+    .groupby('nivel_hierarquia')[Y_hat_df.select_dtypes(include = 'number').columns]\
+    .sum()
+```
+
+![image](https://github.com/barbosarafael/multiple-time-series-forecast/assets/44044829/8d103b66-24ed-4b59-b0dc-8211b44e6897)
+
+Na imagem, notem que as resultados das projeções dos níveis não batem. Não achei um motivo específico para isso, minha hipótese é que isso acontença devido a independência das séries devido aos níveis. 
+
+**Para** essas projeções de diferentes níveis baterem, utilizamos a **Reconciliação**:
+
 
 - reconciliação
 - tipos de reconciliação: bottomup, topdown e demais
