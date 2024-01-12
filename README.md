@@ -44,7 +44,7 @@ O lado positivo dessa "última dificuldade" é que um Estado só pode estar dent
 
 De forma visual e resumida, a nossa hierarquia de variáveis pode ser representada da maneira acima.
 
-Agora vamos supor que rodamos modelos para projetar as vendas para as séries, dentro de cada nível, isto é, vamos fazer as projeções para cada um dos valores que temos dentro dos níveis. Exemplos abaixo:
+Agora vamos supor que **rodamos modelos** para projetar as vendas para as séries, dentro de cada nível, isto é, vamos fazer as projeções para cada um dos valores que temos dentro dos níveis. Exemplos abaixo:
 
 - Nível I: SouthCentral
 - Nível II: SouthCentral/Vermont, SouthCentral/Maine e SouthCentral/Connecticut
@@ -53,7 +53,7 @@ Agora vamos supor que rodamos modelos para projetar as vendas para as séries, d
   - SouthCentral/Maine/Roupas Femininas, SouthCentral/Maine/Roupas Masculinas e SouthCentral/Maine/Roupas Infantil
   - SouthCentral/Connecticut/Roupas Femininas, SouthCentral/Connecticut/Roupas Masculinas e SouthCentral/Connecticut/Roupas Infantil
  
-Infelizmente, na hora de agregar os valores nos níveis acima os valores não batem. Para o nosso caso, a soma das vendas projetadas do nível item (roupas femininas, masculinas e infantis) não será igual ao valor de vendas projetadas para o estado de Vermont. E assim sucessitivamente, até o maior nível.
+Infelizmente, na hora de agregar os valores nos níveis acima os valores não batem. Para o nosso caso, estamos falando que a projeção das vendas de todos os Estados na Região SouthCentral não batem com as vendas da Região SouthCentral.
 
 ```python
 Y_hat_df\
@@ -71,9 +71,45 @@ Na imagem, notem que as resultados das projeções dos níveis não batem. Não 
 
 **Para** essas projeções de diferentes níveis baterem, utilizamos a **Reconciliação**:
 
+### 2.3. Reconciliação
 
-- reconciliação
-- tipos de reconciliação: bottomup, topdown e demais
+Como comentei acima, a Reconciliação é o método que vai fazer a soma das projeções dos diferentes níveis baterem. Ele é um processo após a projeção, como podemos ver na imagem abaixo.
+
+<p>
+    <img src="https://github.com/barbosarafael/multiple-time-series-forecast/assets/44044829/1a2c4a23-e417-44cf-ad33-c4efc5c35a26" alt>
+    <em>Retirado de: Hierarchical TimeSeries Reconciliation by Adrien</em>
+</p>
+
+Existem uma boa quantidade de métodos de reconciliação. Os principais são:
+
+#### BottomUp
+
+![image](https://github.com/barbosarafael/multiple-time-series-forecast/assets/44044829/ebfd2997-59ba-4d37-84fe-ff162016be18)
+
+A intuição por trás desse método é, que após a projeção, começaremos a "reestimar" as projeções a partir dos menores níveis até chegar no maior nível. 
+
+#### TopDown
+
+![image](https://github.com/barbosarafael/multiple-time-series-forecast/assets/44044829/c8f2d96c-1ecf-427e-8007-cce8b31e1fb4)
+
+Ao contrário do BottomUp, o TopDown começa o processo de "reestimação" das projeções a partir do maior nível até chegar no menor nível. 
+
+#### MiddleOut
+
+![image](https://github.com/barbosarafael/multiple-time-series-forecast/assets/44044829/aaceeeb5-2224-492b-b01e-1258ffb6e060)
+
+As "reestimações" desse método começam a partir de algum nível intermediário. Para o nosso caso, esse nível deveria ser o nível de Estado (Região/Estado, no código). 
+
+#### Outras
+
+Existem outros métodos que mudam a forma a estratégia de como esse processo de "reestimação" vai acontecer e outras focadas em diminuir o erro. Algumas delas são:
+
+- OptimalCombination
+- MinTrace
+- ERM
+- PERMBU
+- Normality
+- Bootstrap
 
 ## 3. Resultados
 
