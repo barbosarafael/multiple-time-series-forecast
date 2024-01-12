@@ -111,9 +111,7 @@ Existem outros métodos que mudam a forma a estratégia de como esse processo de
 - Normality
 - Bootstrap
 
-## 3. Resultados
-
-### 3.1. Exploração
+## 3. Explorações iniciais
 
 Apenas alguns highlights:
 
@@ -128,14 +126,85 @@ Apenas alguns highlights:
 
 Dentro da pasta [01-explorations](https://github.com/barbosarafael/multiple-time-series-forecast/tree/main/02-notebooks/01-explorations) tem as análises mais detalhadas. 
 
-### 3.2. Modelos
+## 4. Processo de modelagem
 
-- resultado das métricas
-- projeções no tempo
-- tunagem dos modelos com optuna
-- dataframe com o que foi passado para o modelo (ML)
-- feature importance
+### 4.1. Organização dos dados
 
-## 4. Modelo em produção
+![image](https://github.com/barbosarafael/multiple-time-series-forecast/assets/44044829/ef98a6d7-5d37-4037-b0f3-323f07b4bae1)
 
-## Referências
+As bibliotecas `StatsForecast` e `MLForecast` exigem que os dados estejam formatados de uma maneira bastante específica. 
+
+A primeira modificação é renomear as colunas de data e quantidade de vendas:
+
+```python
+#---- 3. Renomeando as variáveis de quantidade de vendas e data:
+# date -> ds
+# quantity -> y
+
+df = df\
+    .rename(columns = {'date': 'ds', 
+                       'quantity': 'y'})
+```
+
+A segunda modificação é o formato dos dados. Para isso, vamos utilizar a função aggregate. Ela exige dois parâmetros: um dataframe com os dados (ver print acima) e uma lista de lista das hierarquias `[['region'], ['region', 'state'], ['region', 'state', 'item']]`. 
+
+Criei uma função para deixar isso de forma mais simples. 
+
+
+```python
+def format_hierarchical_df(df: pd.DataFrame, cols_hierarchical: list):
+
+    #---- 1. Cria uma lista de listas: [[col1], [col1, col2], ..., [col1, col2, coln]]
+
+    hier_list = [cols_hierarchical[:i] for i in range(1, len(cols_hierarchical) + 1)]
+
+    #---- 2. Aplica a função aggregate que formata os dados em que a lib hierarchical pede
+
+    Y_df, S_df, tags = aggregate(df = df, spec = hier_list)
+
+    return Y_df, S_df, tags
+```
+
+Ela retorna 3 objetos. 
+
+**Y_df**: dataframe hierarquico. Notem que foi criado uma série para cada possibilidade dentro dos níveis que havia comentado.
+
+![image](https://github.com/barbosarafael/multiple-time-series-forecast/assets/44044829/968fd956-a13d-48d7-9d5d-0bb9ca6dd45a)
+
+**tags**: dicionário onde as chaves são os níveis (region, region/state e region/state/item) e as chaves as combinações dentro desses níveis.
+
+![image](https://github.com/barbosarafael/multiple-time-series-forecast/assets/44044829/02a58d6e-fd23-4edc-984f-c577a880d604)
+
+**S_df**: dataframe/matriz que ajuda na hora de fazer a reconciliação. Identifica se um nível pertence ao outro.
+
+### 4.2. Separação em treino e validação
+
+Sem muito rodeio aqui:
+
+- Treino: 25/11/1997 a 31/12/2008
+- Validação: 01/01/2009 a 28/07/2009 (quase 8 meses)
+
+Teremos um **Y_train_df** e um **Y_valid_df**.
+
+### 4.3. Aplicação dos modelo (TO-DO)
+
+- Falar dos modelos tunados
+- Mostrar o que foi "treinado" preprocess
+
+### 4.4. Predict do modelo (TO-DO)
+
+### 4.5. Reconciliação (TO-DO)
+
+## 5. Avaliação dos modelos (TO-DO)
+
+### 5.1. RMSE (TO-DO)
+
+### 5.2. Comparação gráfica (TO-DO)
+
+## 6. Tabela final (TO-DO)
+
+## 7. Feature importance (TO-DO)
+
+## 8. Modelo em produção (TO-DO)
+
+## 9. Referências (TO-DO)
