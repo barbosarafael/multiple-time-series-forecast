@@ -115,6 +115,19 @@ Existem outros métodos que mudam a forma a estratégia de como esse processo de
 
 ### 3.1. Exploração
 
+Apenas alguns highlights:
+
+- As datas mais recentes são as que possuem mais vendas
+- Tennessee (1.351.608), Kentucky (1.298.425) e California (1.173.635) são os estados com mais vendas
+- Vestimentas de mulheres são os itens mais vendidos (11.283.595)
+- SouthCentral é a região/regional com maior quantidade de vendas (4.792.847)
+- Tennessee/womens_clothing/SouthCentral foi a combinação (variáveis region/state/item) que teve mais vendas durante o período 
+- Tendência nas no aumento das vendas no varejo, perceptível a partir dos anos 2000 (ver imagem abaixo)
+
+![image](https://github.com/barbosarafael/multiple-time-series-forecast/assets/44044829/5bb81ca3-3402-4207-825e-9f7a137b3da5)
+
+Dentro da pasta [01-explorations](https://github.com/barbosarafael/multiple-time-series-forecast/tree/main/02-notebooks/01-explorations) tem as análises mais detalhadas. 
+
 ### 3.2. Modelos
 
 - resultado das métricas
