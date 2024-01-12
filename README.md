@@ -186,25 +186,25 @@ Sem muito rodeio aqui:
 
 Teremos um **Y_train_df** e um **Y_valid_df**.
 
-### 4.3. Aplicação dos modelo (TO-DO)
+### 4.3. Aplicação dos modelo 
 
 - Falar dos modelos tunados
 - Mostrar o que foi "treinado" preprocess
 
-### 4.4. Predict do modelo (TO-DO)
+### 4.4. Predict do modelo
 
-### 4.5. Reconciliação (TO-DO)
+### 4.5. Reconciliação
 
-## 5. Avaliação dos modelos (TO-DO)
+## 5. Avaliação dos modelos
 
-### 5.1. RMSE (TO-DO)
+### 5.1. RMSE
 
-### 5.2. Comparação gráfica (TO-DO)
+### 5.2. Comparação gráfica
 
-## 6. Tabela final (TO-DO)
+## 6. Tabela final
 
-## 7. Feature importance (TO-DO)
+## 7. Feature importance
 
-## 8. Modelo em produção (TO-DO)
+## 8. Modelo em produção
 
-## 9. Referências (TO-DO)
+## 9. Referências
