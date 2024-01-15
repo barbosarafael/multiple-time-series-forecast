@@ -188,6 +188,57 @@ Teremos um **Y_train_df** e um **Y_valid_df**.
 
 ### 4.3. Aplicação dos modelo 
 
+Ao total, vamos testar 8 modelos:
+
+- **Baseline**: Naive
+- **Clássicos de séries temporais**
+  1. HoltWinters
+  2. ARIMA
+  3. ETS
+- **Machine Learning**
+  1. Regressão Linear
+  2. Árvore de decisão: com e sem tuning
+  3. Random Forest: com e sem tuning
+  4. LightGBM: com e sem tuning
+  5. XGBoost: com e sem tuning
+
+O processo de tuning dos modelos foi baseado no post do Mario Filho, [Multiple Time Series Forecasting With LightGBM In Python](https://forecastegy.com/posts/multiple-time-series-forecasting-with-lightgbm-in-python/#tuning-lightgbm-hyperparameters-with-optuna).
+
+
+#### Séries Temporais
+
+Iremos utilizar a lib `statsforecast`, que contém os modelos. O notebook com esses resultados podem ser encontrados em [01-baseline_and_ts_models.ipynb](https://github.com/barbosarafael/multiple-time-series-forecast/blob/main/02-notebooks/02-baseline_and_ts/01-baseline_and_ts_models.ipynb). Primeiro, vamos definir os modelos que iremos utilizar e instanciá-los.
+
+```python
+from statsforecast import StatsForecast
+from statsforecast.models import Naive, AutoARIMA, HoltWinters, AutoETS
+
+naive = Naive() # baseline
+arima = AutoARIMA(season_length = 7) # ARIMA com sazonalidade de 7 dias
+hw = HoltWinters(season_length = 7, error_type = 'M') # Holtwinters com sazonalidade de 7 dias e erro do tipo Aditivo
+ets = AutoETS(season_length = 7) # ETS com sazonalidade de 7 dias
+
+model = StatsForecast(models = [naive, arima, hw, ets], freq = 'D', n_jobs = -1)
+model.fit(Y_train_df)
+```
+
+Notem que passei um parâmetro de identificação de sazonalidade de 7 dias. 
+
+Após isso, passamos para a função `StatsForecast` os modelos, a frequência, que será Diária, e quantos cores de CPU serão utilizados para o processo, -1 significa todos. E no fim o `.fit` aplicando os modelos nos dados de treino.
+
+No fim ele mostra somente o seguinte output:
+
+```
+StatsForecast(models=[Naive,AutoARIMA,HoltWinters,AutoETS])
+```
+
+> Um adendo aqui, na documentação da lib, eles aceitam dataframes do Pandas, Spark, Dask e Ray. Li em algum local que estão começando a desenvolver para aceitar em Polars também.
+
+#### Machine Learning
+
+
+
+
 - Falar dos modelos tunados
 - Mostrar o que foi "treinado" preprocess
 
