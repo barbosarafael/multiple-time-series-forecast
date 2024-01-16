@@ -202,9 +202,6 @@ Ao total, vamos testar 8 modelos:
   4. LightGBM: com e sem tuning
   5. XGBoost: com e sem tuning
 
-O processo de tuning dos modelos foi baseado no post do Mario Filho, [Multiple Time Series Forecasting With LightGBM In Python](https://forecastegy.com/posts/multiple-time-series-forecasting-with-lightgbm-in-python/#tuning-lightgbm-hyperparameters-with-optuna).
-
-
 #### Séries Temporais
 
 Iremos utilizar a lib `statsforecast`, que contém os modelos. O notebook com esses resultados podem ser encontrados em [01-baseline_and_ts_models.ipynb](https://github.com/barbosarafael/multiple-time-series-forecast/blob/main/02-notebooks/02-baseline_and_ts/01-baseline_and_ts_models.ipynb). Primeiro, vamos definir os modelos que iremos utilizar e instanciá-los.
@@ -236,11 +233,87 @@ StatsForecast(models=[Naive,AutoARIMA,HoltWinters,AutoETS])
 
 #### Machine Learning
 
+Para a parte de ML, teremos um mix de bibliotecas dos modelos (qualquer um que seja `.fit` e `.transform`), como o `scikit-learn`, `lightgbm` e `xgboost`. E também temos a `MLForecast` que irá fazer o processo de modelagem. 
 
+Mas antes de aplicar esses modelos fiz um tuning dos modelos antes. Onde temos um notebook para cada tuning dos modelos:
 
+- [Árvore de decisão](https://github.com/barbosarafael/multiple-time-series-forecast/blob/main/02-notebooks/03-ml-models/02-tuning-dec-tree.ipynb)
+- [Random Forest](https://github.com/barbosarafael/multiple-time-series-forecast/blob/main/02-notebooks/03-ml-models/03-tuning-random-forest.ipynb)
+- [LGBM](https://github.com/barbosarafael/multiple-time-series-forecast/blob/main/02-notebooks/03-ml-models/04-tuning-lgbm.ipynb)
+- [XGBoost](https://github.com/barbosarafael/multiple-time-series-forecast/blob/main/02-notebooks/03-ml-models/05-tuning-xgboost.ipynb)
 
-- Falar dos modelos tunados
-- Mostrar o que foi "treinado" preprocess
+E salvei os hiperparâmetros na pasta [03-best-params](https://github.com/barbosarafael/multiple-time-series-forecast/tree/main/03-best-params). O processo de tuning dos modelos foi baseado no post do [Mario Filho](https://github.com/ledmaster), [Multiple Time Series Forecasting With LightGBM In Python](https://forecastegy.com/posts/multiple-time-series-forecasting-with-lightgbm-in-python/#tuning-lightgbm-hyperparameters-with-optuna).
+
+Já que estamos falando de modelos de ML, podemos adicionar novas features para melhorar (ou não) o desempenho do modelo. Em séries temporais, as mais comuns são features que extraímos da data, como o dia da semana, dia do ano, semana do ano e etc, para identificar sazonalidade, tendência e padrões de datas anteriores. No `MLForecast` existe um parâmetro que você passa quais dessas features você deseja e ele mesmo extrai, em vez de ter que criar "na mão" com o Pandas. 
+
+```python
+date_features = ['dayofweek', 'month', 'year', 'quarter', 'day', 'week'] # Features de data`
+```
+
+Outras features que podem ser extraídas são versões passadas da sua própria variável resposta (y), que são chamadas de *lag* ou *diff*. Que também são facilmente extraídas pelo `MLForecast`. 
+
+```python
+lags = [1, 7, 14, 21, 28, 30] # Criação de novas features de lags de 1, 7, ..., 30 dias da variável resposta
+```
+
+Podemos extrair também features de médias móveis, médias móveis sazonais, entre outras. Dependendo claro de quantos dias você vai querer que seja feito o cálculo da média móvel. O que é bem acessível de fazer com a ajuda das libs `window_ops` com o `numba`.
+
+```python
+#---- Features de data:
+
+from numba import njit
+from window_ops.expanding import expanding_mean
+from window_ops.rolling import rolling_mean
+
+@njit
+def rolling_mean_7(x):
+    return rolling_mean(x, window_size = 7)
+
+@njit
+def rolling_mean_14(x):
+    return rolling_mean(x, window_size = 14)
+
+@njit
+def rolling_mean_21(x):
+    return rolling_mean(x, window_size = 21)
+
+@njit
+def rolling_mean_28(x):
+    return rolling_mean(x, window_size = 28)
+```
+
+Com isso, podemos aplicar todos esses parâmetros na nossa principal função, `MLForecast`, que fará o processo do `.fit`. 
+
+```python
+models_list = [lin_reg, dec_tree, tun_dec_tree, ran_forest, tun_ran_forest, lgbm, tun_lgbm, xgb, tun_xgb]
+
+model = MLForecast(models = models_list, # Lista com 9 modelos
+                   freq = 'D', # Frequência diária
+                   num_threads = 6,
+                   lags = [1, 7, 14, 21, 28, 30], # Criação de novas features de lags de 1, 7, ..., 30 dias da variável resposta
+                   date_features = ['dayofweek', 'month', 'year', 'quarter', 'day', 'week'], # Features de data
+                   lag_transforms = {
+                       1: [expanding_mean],
+                       7: [rolling_mean_7],
+                       14: [rolling_mean_14],
+                       21: [rolling_mean_21],
+                       28: [rolling_mean_28],
+                   }
+           )
+
+model.fit(Y_train_df.reset_index(), id_col = 'unique_id', time_col = 'ds', target_col = 'y', fitted = True)
+```
+
+Com o objeto `model` conseguimos acessar um método chamado `.preprocess` e visualizar um dataframe Pandas com o que foi treinado pelo modelo.
+
+```python
+model.preprocess(Y_train_df.reset_index())
+```
+
+![Alt text](image.png)
+
+> Mais um adendo aqui. A nossa série inicia em 25/11/1997 mas no dataframe acima, os dados começam a ser treinados a partir do dia 19/01/1998. Não faz muito sentido. São 55 dias entre as duas datas e nenhum dos parâmetros que passei corresponde a esse valor 
+
 
 ### 4.4. Predict do modelo
 
@@ -259,3 +332,8 @@ StatsForecast(models=[Naive,AutoARIMA,HoltWinters,AutoETS])
 ## 8. Modelo em produção
 
 ## 9. Referências
+
+Melhorias: 
+
+- Extrair features de feriados
+- Modelar com alguma transformação: como box-cox ou raiz quadrada
