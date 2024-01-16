@@ -310,7 +310,7 @@ Com o objeto `model` conseguimos acessar um método chamado `.preprocess` e visu
 model.preprocess(Y_train_df.reset_index())
 ```
 
-![Alt text](image.png)
+![Alt text](04-images/image.png)
 
 > Mais um adendo aqui. A nossa série inicia em 25/11/1997 mas no dataframe acima, os dados começam a ser treinados a partir do dia 19/01/1998. Não faz muito sentido. São 55 dias entre as duas datas e nenhum dos parâmetros que passei corresponde a esse valor 
 
