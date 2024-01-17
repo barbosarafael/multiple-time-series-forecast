@@ -1,0 +1,8 @@
+pandas==2.1.4
+numpy==1.23.5
+hierarchicalforecast==0.4.1
+statsforecast==1.7.0
+mlforecast==0.11.4
+scikit-learn==1.3.2
+lightgbm==4.2.0
+xgboost==2.0.3
