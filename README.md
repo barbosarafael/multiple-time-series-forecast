@@ -317,6 +317,45 @@ model.preprocess(Y_train_df.reset_index())
 
 ### 4.4. Predict do modelo
 
+#### Séries Temporais
+
+```python
+n_horizon = Y_valid_df.ds.nunique() # Quantidade de dias para a projeção
+
+Y_hat_df = model.forecast(h = n_horizon, fitted = True)
+
+Y_hat_df.head()
+```
+
+![Alt text](04-images/image-1.png)
+
+A quantidade de dias para a projeção peguei diretamente da documentação, por isso o jeitinho diferente. O `fitted = True` vai servir para criarmos um novo dataframe com o que o modelo projetou para os dados de treino.
+
+```python
+Y_fitted_df = model.forecast_fitted_values()
+
+display(Y_fitted_df.head())
+display(Y_fitted_df.tail())
+```
+
+![Alt text](04-images/image-3.png)
+
+#### Machine Learning
+
+
+```python
+Y_hat_df = model.predict(h = n_horizon)
+```
+
+O que difere entre as projeções é o método utilizado dentro `model`, um é `predict` ou outro é `forecast`.
+
+![Alt text](04-images/image-4.png)
+
+Dentro do `.fit` do modelo passamos um parâmetro de `fitted = True` também, com o mesmo objetivo dos modelos de Séries Temporais. E com o mesmo código temos o mesmo resultado.
+
+![Alt text](04-images/image-6.png)
+
+
 ### 4.5. Reconciliação
 
 ## 5. Avaliação dos modelos
