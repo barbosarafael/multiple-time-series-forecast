@@ -403,7 +403,7 @@ Primeiramente adicionamos em uma lista todos os métodos de reconciliação que 
 
 Agora, com os métodos de reconciliação, temos 151 modelos diferentes que podemos analisar para identificar qual se aproxima mais das vendas realizadas. 
 
-> Já já vocês virão que os resultados desses métodos de reconciliação são muito próximos entre eles ou muito distante das vendas realizadas. 
+> Estava trocando ideia com um coordenador de dados do da firma sobre esse projeto e ele fez a seguinte provocação: "O BottomUp se dá melhor nos menores níveis?". Não soube responder. Vendo os resultados aqui, vejo que não necessariamente.
 
 ## 5. Avaliação dos modelos
 
@@ -439,7 +439,6 @@ evaluation = evaluator.evaluate(
 
 ![Alt text](04-images/image-9.png)
 
-
 Com isso, o nosso objeto `evaluation` tem uma carinha parecida com o dataframe da imagem acima. Ele calcula o RMSE por nível e também geral para cada modelo.
 
 Para ficar mais fácil identificar quais os melhores modelos, i.e, os que tem menor RMSE, criei esses dois gráficos.
@@ -448,23 +447,103 @@ Para ficar mais fácil identificar quais os melhores modelos, i.e, os que tem me
 
 No geral, o melhor modelo são os de Machine Learning, em específico a Regressão Linear, são os melhores, pois possuem menor RMSE, em comparação com a Baseline e os modelos de Séries Temporais. 
 
-Então, se fôssemos escolher modelos a serem escolhidos, seriam esses do gráfico.
-
 > E, como comentei anteriormente. As métricas entre os modelos ficam muito parecidas. 
 
 ### 5.2. Comparação gráfica
 
-![Alt text](https://media.geeksforgeeks.org/wp-content/uploads/20231017064859/gh.png)
-
 Uma comparação mais "olhométrica", iremos ver como as projeções estão se comportando em comparação com o que foi vendido. 
 
+#### Séries Temporais
 
+Aqui separei o resultado de um dos melhores modelos de Séries Temporais: AutoARIMA/BottomUp. Caso quiser mudar, bastaria mudar no parâmetro `models`. 
+
+As visualizações são dos maiores níveis, por default. Vemos que os resultados estão bem ruins, pois ele está basicamente projetando valores iguais, constantes. Logo, não é um bom modelo, apesar do RMSE.
+
+
+```python
+from utilsforecast.plotting import plot_series
+
+plot_series(
+    Y_train_df.reset_index().query('ds >= "2008-01-01"'), 
+    Y_rec_df.reset_index().merge(Y_valid_df.reset_index(), on = ['unique_id', 'ds'], how = 'left'), 
+    models = ['AutoARIMA/BottomUp'],
+    plot_random = False, 
+)
+```
+
+![Alt text](04-images/image-11.png)
+
+Caso você queira especificar quais os níveis você queira ver, adicione o parâmetro `ids`. Exemplo: `ids = ['EastNorthCentral', 'EastNorthCentral/Illinois', 'EastNorthCentral/Illinois/womens_clothing']`.
+
+#### Machine Learning
+
+Vamos ver o desempenho do LGBMRegressor com o método de reconciliação OptimalCombination (WLS).
+
+```python
+plot_series(
+    Y_train_df.reset_index().query('ds >= "2008-01-01"'), 
+    Y_rec_df.reset_index().merge(Y_valid_df.reset_index(), on = ['unique_id', 'ds'], how = 'left'), 
+    models = ['LGBMRegressor/OptimalCombination_method-wls_struct_nonnegative-True'],
+    plot_random = False
+)
+```
+
+![Alt text](04-images/image-12.png)
+
+Temos uma variabilidade nas projeções, diferente dos modelos de Séries Temporais, mas precisaríamos olhar com mais calma as projeções dos demais. 
+
+
+#### Opinião do autor
+
+Os principais métodos já descrevi, talvez não tenhamos os melhores resultados. Show de bola! Para o seu contexto, caso siga esses passos, identifique quais são os seus principais IDs. 
+
+Isto é, quais são suas combinações mais importantes para que você consiga entender se o seu modelo está projetando bem ou não. 
 
 ## 6. Tabela final
 
+Considerando que já temos um melhor modelo, junto a suas projeções. Como entregar essas projeções?
 
+![image](https://github.com/barbosarafael/multiple-time-series-forecast/assets/44044829/ef98a6d7-5d37-4037-b0f3-323f07b4bae1)
 
-## 7. Feature importance
+Acima temos os dados históricos que recebemos. Vamos criar uma tabela praticamente igual a essa, agora com as projeções. Vamos considerar que temos as projeções dos modelos de Machine Learning, já considerando  os métodos de reconciliação (`Y_rec_df`).
+
+![Alt text](04-images/image-8.png)
+
+A ideia aqui é apenar organizar o dataframe acima para que ele pareça com os dados que recebemos. Para isso, criei uma função, já aproveitando que iremos para um passo de automação no futuro.
+
+```python
+def create_final_df(df_pred: pd.DataFrame, cols_split: str):
+
+    df1 = df_pred\
+        .reset_index()\
+        .assign(\
+            nivel_hierarquia = lambda x: np.where(x['unique_id'].str.count('/') == 0, 1, x['unique_id'].str.count('/') + 1)
+        )\
+        .query('nivel_hierarquia == 3')
+    
+    df1[cols_split] = df1['unique_id'].str.split(pat = '/', n = len(cols_split), expand = True)
+    
+    df1 = df1[cols_split + ['ds'] + df1.select_dtypes(include = 'number').columns.tolist()]
+
+    return df1
+
+create_final_df(df_pred = Y_rec_df, cols_split = cols_hierarchical)
+  
+```
+
+![Alt text](04-images/image-13.png)
+
+O que fizemos aqui:
+
+- reset_index: para que o index (`unique_id`) virasse uma coluna
+- criação da variável `nivel_hierarquia` que identifica se o `unique_id` é da hierarquia 1, 2 ou 3 (1: nível região, 2: região/estado e 3: região/estado/item)
+- **Filtramos somente os dados onde o nivel == 3**
+- Abrimos a coluna de unique_id em 3: região, estado e item
+- Selecionamos somente as colunas úteis
+
+> Um adendo sobre o bullet em negrito. Selecionando somente o nível 3 estamos ignorando o restante dos níveis. Isso é uma boa prática? Confesso que não sei, pois não achei nenhum outro artigo em como entregar uma tabela final das projeções. Idealmente você tem que pesar entre os seus modelos nos diferentes níveis de projeção e ver o desempenho no nível 3, pois ele será o escolhido. Espero que essa não seja a única opção, pois é *paia*.
+
+## 7. Bônus: Feature importance para os modelos de Machine Learning
 
 ## 8. Modelo em produção
 
