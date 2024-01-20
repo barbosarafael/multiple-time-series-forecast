@@ -355,16 +355,112 @@ Dentro do `.fit` do modelo passamos um parâmetro de `fitted = True` também, co
 
 ![Alt text](04-images/image-6.png)
 
-
 ### 4.5. Reconciliação
+
+Com a lib `hierarchicalforecast` facilmente podemos fazer o processo de reconciliação. Lembrando que esse ŕé um processo pós-modelagem.
+
+```python
+
+from hierarchicalforecast.methods import BottomUp, TopDown, ERM, OptimalCombination, MinTrace, MiddleOut
+from hierarchicalforecast.core import HierarchicalReconciliation
+
+reconcilers = [BottomUp(), 
+               TopDown(method = 'forecast_proportions'),
+               TopDown(method = 'average_proportions'),
+               TopDown(method = 'proportion_averages'),
+               MiddleOut(middle_level = 'region/state', top_down_method = 'forecast_proportions'),
+               MiddleOut(middle_level = 'region/state', top_down_method = 'average_proportions'),
+               MiddleOut(middle_level = 'region/state', top_down_method = 'proportion_averages'),
+               MinTrace(method = 'ols', nonnegative = True),
+               MinTrace(method = 'wls_struct', nonnegative = True),
+               MinTrace(method = 'wls_var', nonnegative = True),
+               MinTrace(method = 'mint_shrink', nonnegative = True),
+               OptimalCombination(method = 'ols', nonnegative = True),
+               OptimalCombination(method = 'wls_struct', nonnegative = True)
+              ]
+
+hrec = HierarchicalReconciliation(reconcilers = reconcilers)
+
+Y_rec_df = hrec.reconcile(Y_hat_df = Y_hat_df, # Dataframe com as projeções cruas
+                          Y_df = Y_fitted_df, # Dataframe com as estimações do modelo nos dados de treino
+                          S = S_df, # Sparse dataframe (0 ou 1) de cada combinação
+                          tags = tags)
+
+```
+
+Pensando que estamos aqui para experimentar, vamos testar (quase) todos os métodos de reconciliação que tem disponíveis na lib. 
+
+Primeiramente adicionamos em uma lista todos os métodos de reconciliação que queremos utilizar, logo após passamos eles para a função `HierarchicalReconciliation`. Essa parte de reconciliação é semelhante nos modelos de Séries Temporais e de Machine Learning. 
+
+#### Séries Temporais
+
+![Alt text](04-images/image-7.png)
+
+#### Machine Learning
+
+![Alt text](04-images/image-8.png)
+
+
+Agora, com os métodos de reconciliação, temos 151 modelos diferentes que podemos analisar para identificar qual se aproxima mais das vendas realizadas. 
+
+> Já já vocês virão que os resultados desses métodos de reconciliação são muito próximos entre eles ou muito distante das vendas realizadas. 
 
 ## 5. Avaliação dos modelos
 
+Agora que já nossas versões finais dos modelos, podemos efetivamente comparar o que eles projetaram com os nossos dados de vendas realizadas. 
+
+Das métricas convencionais, iremos utilizar o RMSE. 
+
 ### 5.1. RMSE
+
+![Alt text](https://miro.medium.com/v2/resize:fit:966/1*lqDsPkfXPGen32Uem1PTNg.png)
+
+Métrica clássica de problemas de regressão dentro do Machine Learning e Estatística. A intuição por trás dele é: a média dos erros do seu modelo, em comparação com o que foi realizado. 
+
+Para o nosso contexto, isso significa que esses erros serão avaliados calculados nos dias dos nossos dados de validação, entre 01/01/2009 a 28/07/2009. 
+
+
+```python
+
+from hierarchicalforecast.evaluation import HierarchicalEvaluation
+
+def rmse(y_true, y_pred):
+    
+    return np.sqrt(np.mean(np.square(y_true - y_pred)))
+
+evaluator = HierarchicalEvaluation(evaluators = [rmse])
+
+evaluation = evaluator.evaluate(
+    Y_hat_df = Y_rec_df,
+    Y_test_df = Y_valid_df,
+    tags = tags
+)
+```
+
+![Alt text](04-images/image-9.png)
+
+
+Com isso, o nosso objeto `evaluation` tem uma carinha parecida com o dataframe da imagem acima. Ele calcula o RMSE por nível e também geral para cada modelo.
+
+Para ficar mais fácil identificar quais os melhores modelos, i.e, os que tem menor RMSE, criei esses dois gráficos.
+
+![Alt text](04-images/image-10.png)
+
+No geral, o melhor modelo são os de Machine Learning, em específico a Regressão Linear, são os melhores, pois possuem menor RMSE, em comparação com a Baseline e os modelos de Séries Temporais. 
+
+E, como eu comentei anteriormente. As métricas entre os modelos ficam muito parecidos. 
 
 ### 5.2. Comparação gráfica
 
+![Alt text](https://media.geeksforgeeks.org/wp-content/uploads/20231017064859/gh.png)
+
+Uma comparação mais "olhométrica", iremos ver como as projeções estão se comportando em comparação com o que foi vendido. 
+
+
+
 ## 6. Tabela final
+
+
 
 ## 7. Feature importance
 
@@ -375,4 +471,5 @@ Dentro do `.fit` do modelo passamos um parâmetro de `fitted = True` também, co
 Melhorias: 
 
 - Extrair features de feriados
+- - Adicionar os intervalos de confiança
 - Modelar com alguma transformação: como box-cox ou raiz quadrada
