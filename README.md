@@ -448,7 +448,9 @@ Para ficar mais fácil identificar quais os melhores modelos, i.e, os que tem me
 
 No geral, o melhor modelo são os de Machine Learning, em específico a Regressão Linear, são os melhores, pois possuem menor RMSE, em comparação com a Baseline e os modelos de Séries Temporais. 
 
-E, como eu comentei anteriormente. As métricas entre os modelos ficam muito parecidos. 
+Então, se fôssemos escolher modelos a serem escolhidos, seriam esses do gráfico.
+
+> E, como comentei anteriormente. As métricas entre os modelos ficam muito parecidas. 
 
 ### 5.2. Comparação gráfica
 
