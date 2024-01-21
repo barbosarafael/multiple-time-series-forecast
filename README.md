@@ -1,6 +1,6 @@
 # Projeção de múltiplas séries temporais
 
-Salve! Nesse repositório irei mostrar como podemos fazer projeções múltiplas séries temporais de uma única vez. 
+Nesse repositório vou mostrar como podemos fazer projeções múltiplas séries temporais de uma única vez. 
 
 ## 1. Dados utilizados
 
@@ -545,12 +545,56 @@ O que fizemos aqui:
 
 ## 7. Bônus: Feature importance para os modelos de Machine Learning
 
-## 8. Modelo em produção
+No [artigo](https://mariofilho.com/como-prever-series-temporais-com-scikit-learn/#import%C3%A2ncia-das-features) do Mario Filho, ele também ensina a extrair a feature importance dos modelos de Machine Learning. 
+
+Vale lembrar aqui que cada modelo tem suas particularidades de feature importance. Por exemplo, o Random Forest mede a feature importance a partir da impureza, quanto mais alto a impureza da variável, maior a importância (gini). 
+
+Já o XGBoost tem 5 métodos diferentes para medir, depende do seu ponto de vista qual utilizar. Mas por padrão utiliza o `weight`, que rankeia as features a partir da quantidade de vezes que elas foram utilizadas para dividir os dados.
+
+O código abaixo vai gerar a feature importance de todos os modelos, exceto da Regressão Linear. 
+
+```python
+import matplotlib.pyplot as plt
+
+for mod in list(model.models_.keys()):
+
+    if mod == 'LinearRegression':
+
+        pass
+
+    else:
+
+        plt.figure(figsize = (10, 4))
+
+        pd.Series(model.models_[mod].feature_importances_, 
+                  index = model.ts.features_order_)\
+            .sort_values(ascending = False)\
+            .plot\
+            .bar(title = f'{mod} Feature Importance',
+                 xlabel = 'Features', 
+                 ylabel = 'Importance')
+```
+
+![Alt text](04-images/image-14.png)
+
+Um print da feature importance do LGBM. Na qual apontou que as features mais importantes foram a `lag1`, `dia da seman` e o `dia`.
+
+## 8. Modelo em produção (TO-DO)
+
+- Por enquanto, tudo está salvo na pasta [05-prd](https://github.com/barbosarafael/multiple-time-series-forecast/tree/main/05-prd).
 
 ## 9. Referências
 
-Melhorias: 
+- **Hierarchical Forecasting in Python | Nixtla**: https://www.youtube.com/watch?v=lotzOJuwxYs&ab_channel=DataCouncil
+- **Multiple Time Series Forecasting With LightGBM In Python**: https://forecastegy.com/posts/multiple-time-series-forecasting-with-lightgbm-in-python/
+- **Como Prever Séries Temporais com Scikit-learn**: https://mariofilho.com/como-prever-series-temporais-com-scikit-learn/
+- **Hierarchical TimeSeries Reconciliation**: https://medium.com/@adeforceville_96412/hierarchical-timeseries-reconciliation-58addce2aeb7
+- **Chapter 11 Forecasting hierarchical and grouped time series**: https://otexts.com/fpp3/hierarchical.html
+- **Nixtla/hierarchicalforecast**: https://github.com/Nixtla/hierarchicalforecast
 
-- Extrair features de feriados
-- - Adicionar os intervalos de confiança
+
+## 10. Possíveis melhorias (para outras pessoas): 
+
+- Extrair features de feriados: isso ainda não é possível pela lib
+- Adicionar os intervalos de confiança
 - Modelar com alguma transformação: como box-cox ou raiz quadrada
