@@ -2,6 +2,13 @@
 
 Nesse repositório vou mostrar como podemos fazer projeções múltiplas séries temporais de uma única vez. 
 
+# Índice
+
+- [1. Dados utilizados](https://github.com/barbosarafael/multiple-time-series-forecast/tree/main?tab=readme-ov-file#1-dados-utilizados)
+- [2. Projeções hierárquicas (hierarchical forecast)](https://github.com/barbosarafael/multiple-time-series-forecast/tree/main?tab=readme-ov-file#2-proje%C3%A7%C3%B5es-hier%C3%A1rquicas-hierarchical-forecast)
+  - [2.1. Situação hipotética](https://github.com/barbosarafael/multiple-time-series-forecast/tree/main?tab=readme-ov-file#21-situa%C3%A7%C3%A3o-hipot%C3%A9tica)
+
+
 ## 1. Dados utilizados
 
 Os dados se referem a venda de roupa no varejo dos USA. Os dados raw podem ser encontrados diretamente nesse [link](https://raw.githubusercontent.com/aws-samples/amazon-sagemaker-hierarchical-forecasting/main/retail-usa-clothing.csv). Abaixo um print da tabela.
