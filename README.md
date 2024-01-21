@@ -7,6 +7,23 @@ Nesse repositório vou mostrar como podemos fazer projeções múltiplas séries
 - [1. Dados utilizados](https://github.com/barbosarafael/multiple-time-series-forecast/tree/main?tab=readme-ov-file#1-dados-utilizados)
 - [2. Projeções hierárquicas (hierarchical forecast)](https://github.com/barbosarafael/multiple-time-series-forecast/tree/main?tab=readme-ov-file#2-proje%C3%A7%C3%B5es-hier%C3%A1rquicas-hierarchical-forecast)
   - [2.1. Situação hipotética](https://github.com/barbosarafael/multiple-time-series-forecast/tree/main?tab=readme-ov-file#21-situa%C3%A7%C3%A3o-hipot%C3%A9tica)
+  - [2.2. Um pouquinho de teoria (na prática)](https://github.com/barbosarafael/multiple-time-series-forecast/tree/main?tab=readme-ov-file#22-um-pouquinho-de-teoria-na-pr%C3%A1tica)
+  - [2.3. Reconciliação](https://github.com/barbosarafael/multiple-time-series-forecast/tree/main?tab=readme-ov-file#23-reconcilia%C3%A7%C3%A3o)
+- [3. Explorações iniciais](https://github.com/barbosarafael/multiple-time-series-forecast/tree/main?tab=readme-ov-file#3-explora%C3%A7%C3%B5es-iniciais)
+- [4. Processo de modelagem](https://github.com/barbosarafael/multiple-time-series-forecast/tree/main?tab=readme-ov-file#4-processo-de-modelagem)
+  - [4.1. Organização dos dados](https://github.com/barbosarafael/multiple-time-series-forecast/tree/main?tab=readme-ov-file#41-organiza%C3%A7%C3%A3o-dos-dados)
+  - [4.2. Separação em treino e validação](https://github.com/barbosarafael/multiple-time-series-forecast/tree/main?tab=readme-ov-file#42-separa%C3%A7%C3%A3o-em-treino-e-valida%C3%A7%C3%A3o)
+  - [4.3. Aplicação dos modelos](https://github.com/barbosarafael/multiple-time-series-forecast/tree/main?tab=readme-ov-file#43-aplica%C3%A7%C3%A3o-dos-modelos)
+  - [4.4. Predict do modelo](https://github.com/barbosarafael/multiple-time-series-forecast/tree/main?tab=readme-ov-file#44-predict-do-modelo)
+  - [4.5. Reconciliação](https://github.com/barbosarafael/multiple-time-series-forecast/tree/main?tab=readme-ov-file#45-reconcilia%C3%A7%C3%A3o)
+- [5. Avaliação dos modelos](https://github.com/barbosarafael/multiple-time-series-forecast/tree/main?tab=readme-ov-file#5-avalia%C3%A7%C3%A3o-dos-modelos)
+  - [5.1. RMSE](https://github.com/barbosarafael/multiple-time-series-forecast/tree/main?tab=readme-ov-file#51-rmse)
+  - [5.2. Comparação gráfica](https://github.com/barbosarafael/multiple-time-series-forecast/tree/main?tab=readme-ov-file#52-compara%C3%A7%C3%A3o-gr%C3%A1fica)
+- [6. Tabela final](https://github.com/barbosarafael/multiple-time-series-forecast/tree/main?tab=readme-ov-file#6-tabela-final)
+- [7. Bônus: Feature importance para os modelos de Machine Learning](https://github.com/barbosarafael/multiple-time-series-forecast/tree/main?tab=readme-ov-file#7-b%C3%B4nus-feature-importance-para-os-modelos-de-machine-learning)
+- [8. Modelo em produção (TO-DO)](https://github.com/barbosarafael/multiple-time-series-forecast/tree/main?tab=readme-ov-file#8-modelo-em-produ%C3%A7%C3%A3o-to-do)
+- [9. Referências](https://github.com/barbosarafael/multiple-time-series-forecast/tree/main?tab=readme-ov-file#9-refer%C3%AAncias)
+- [10. Possíveis melhorias (para outras pessoas):](https://github.com/barbosarafael/multiple-time-series-forecast/tree/main?tab=readme-ov-file#10-poss%C3%ADveis-melhorias-para-outras-pessoas)
 
 
 ## 1. Dados utilizados
@@ -193,7 +210,7 @@ Sem muito rodeio aqui:
 
 Teremos um **Y_train_df** e um **Y_valid_df**.
 
-### 4.3. Aplicação dos modelo 
+### 4.3. Aplicação dos modelos
 
 Ao total, vamos testar 8 modelos:
 
