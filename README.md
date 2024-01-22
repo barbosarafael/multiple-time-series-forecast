@@ -612,7 +612,7 @@ Temos 3 arquivos principais para fazer o deploy: `requirements.txt`, `functions.
 
 O requirements é um arquivo de texto com as bibliotecas e suas versões que utilizei nesse projeto. Ele é útil para você ter o exato mesmo ambiente de desenvolvimento que eu tinha quando estava desenvolvendo esse projeto. Tudo começa aqui, não pular para as outras etapas antes de instalar as libs.
 
-ADICIONAR IMAGEM
+![image](https://github.com/barbosarafael/multiple-time-series-forecast/assets/44044829/90177f59-2378-464b-a326-168444bb8a3a)
 
 Para instalar essas bibliotecas de uma única vez, utilize: `pip install -r requirements.txt`.
 
@@ -627,7 +627,7 @@ Contém todos os carregamentos das libs que utilizei e a criação das funções
 5. Aplica os modelos de machine learning
 6. Limpeza dos dados, após a aplicação dos modelos
 
-ADICIONAR IMAGEM
+![image](https://github.com/barbosarafael/multiple-time-series-forecast/assets/44044829/aa1635be-d0dd-474a-9c81-98c3a888a6a0)
 
 #### app.py
 
@@ -635,7 +635,8 @@ Script principal que carrega as funções do `functions.py` e cria um front-end 
 
 Inicialmente lemos os dados. Logo após, crio uma função de `predict`, onde o único argumento dessa função é a quantidade de dias para projeção. E output é um dataframe com as projeções.
 
-ADICIONAR IMAGEM
+![image](https://github.com/barbosarafael/multiple-time-series-forecast/assets/44044829/8cc782fa-470f-4870-9b41-89b96e1caa7e)
+
 
 ## 9. Referências
 
