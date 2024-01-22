@@ -21,7 +21,7 @@ Nesse repositório vou mostrar como podemos fazer projeções múltiplas séries
   - [5.2. Comparação gráfica](https://github.com/barbosarafael/multiple-time-series-forecast/tree/main?tab=readme-ov-file#52-compara%C3%A7%C3%A3o-gr%C3%A1fica)
 - [6. Tabela final](https://github.com/barbosarafael/multiple-time-series-forecast/tree/main?tab=readme-ov-file#6-tabela-final)
 - [7. Bônus: Feature importance para os modelos de Machine Learning](https://github.com/barbosarafael/multiple-time-series-forecast/tree/main?tab=readme-ov-file#7-b%C3%B4nus-feature-importance-para-os-modelos-de-machine-learning)
-- [8. Modelo em produção (TO-DO)](https://github.com/barbosarafael/multiple-time-series-forecast/tree/main?tab=readme-ov-file#8-modelo-em-produ%C3%A7%C3%A3o-to-do)
+- [8. Modelo em produção](https://github.com/barbosarafael/multiple-time-series-forecast/tree/main?tab=readme-ov-file#8-modelo-em-produ%C3%A7%C3%A3o)
 - [9. Referências](https://github.com/barbosarafael/multiple-time-series-forecast/tree/main?tab=readme-ov-file#9-refer%C3%AAncias)
 - [10. Possíveis melhorias (para outras pessoas):](https://github.com/barbosarafael/multiple-time-series-forecast/tree/main?tab=readme-ov-file#10-poss%C3%ADveis-melhorias-para-outras-pessoas)
 
@@ -40,7 +40,7 @@ Os dados se referem a venda de roupa no varejo dos USA. Os dados raw podem ser e
 
 ### 2.1. Situação hipotética
 
-Pensa que tu trabalhas nessa empresa de varejo e o seu chefe pediu para você fazer a projeção de quantas vendas terão para os itens que vocês vendem (roupas feminas e masculinos, sapatos, etc...). Você deve imaginar, ok, são apenas 5 ou 6 itens para projetar, dá para modelar cada série individualmente, na mão. 
+Pensa que tu trabalhas nessa empresa de varejo e o seu chefe pediu para você fazer a projeção de quantas vendas terão para os itens que vocês vendem (roupas feminas e masculinos, sapatos, etc...). Você deve imaginar, ok, são apenas 5 ou 6 itens para projetar, dá para modelar cada série na mão, individualmente. 
 
 ![image](https://github.com/barbosarafael/multiple-time-series-forecast/assets/44044829/cdc477c3-1814-4339-86c7-fabc050d8b60)
 
@@ -48,7 +48,7 @@ Pensa que tu trabalhas nessa empresa de varejo e o seu chefe pediu para você fa
 
 ![image](https://github.com/barbosarafael/multiple-time-series-forecast/assets/44044829/c963677b-f4b0-4bbf-9bae-948df13d2d9e)
 
-Agora teremos que projetar 108 (6 itens $\times$ 18 estados) séries temporais diferentes. Já pensa ter que modelar uma a uma? Na mão? Trabalhoso né?
+Agora teremos que projetar 108 (6 itens $\times$ 18 estados) séries temporais diferentes. Já pensa ter que modelar uma a uma? Na mão?
 
 > Adendo e provocação: Você pode aplicar métodos automáticos de projeção para cada série, como um AutoARIMA da vida. Certíssimo, eu faria isso. Mas e se o seu chefe te pedir para agregar as projeções somente do estado de Nova York? Será que, quando você fazer a agregação para o nível de estado, as projeções irão ser exatamente iguais?
 
@@ -64,9 +64,9 @@ O lado positivo dessa "última dificuldade" é que um Estado só pode estar dent
 
 ### 2.2. Um pouquinho de teoria (na prática)
 
-![image](https://github.com/barbosarafael/multiple-time-series-forecast/assets/44044829/8211ebe8-27c0-41e2-b33a-8a70da774157)
+De forma visual e resumida, a nossa hierarquia de variáveis pode ser representada da seguinte maneira:
 
-De forma visual e resumida, a nossa hierarquia de variáveis pode ser representada da maneira acima.
+![image](https://github.com/barbosarafael/multiple-time-series-forecast/assets/44044829/8211ebe8-27c0-41e2-b33a-8a70da774157)
 
 Agora vamos supor que **rodamos modelos** para projetar as vendas para as séries, dentro de cada nível, isto é, vamos fazer as projeções para cada um dos valores que temos dentro dos níveis. Exemplos abaixo:
 
@@ -77,7 +77,7 @@ Agora vamos supor que **rodamos modelos** para projetar as vendas para as série
   - SouthCentral/Maine/Roupas Femininas, SouthCentral/Maine/Roupas Masculinas e SouthCentral/Maine/Roupas Infantil
   - SouthCentral/Connecticut/Roupas Femininas, SouthCentral/Connecticut/Roupas Masculinas e SouthCentral/Connecticut/Roupas Infantil
  
-Infelizmente, na hora de agregar os valores nos níveis acima os valores não batem. Para o nosso caso, estamos falando que a projeção das vendas de todos os Estados na Região SouthCentral não batem com as vendas da Região SouthCentral.
+Infelizmente, os valores não batem na hora de agregar os valores nos diferentes níveis. Para o nosso caso, estamos falando que a projeção das vendas de todos os **Estados na Região SouthCentral** não batem com as vendas da **Região SouthCentral**.
 
 ```python
 Y_hat_df\
@@ -97,14 +97,14 @@ Na imagem, notem que as resultados das projeções dos níveis não batem. Não 
 
 ### 2.3. Reconciliação
 
-Como comentei acima, a Reconciliação é o método que vai fazer a soma das projeções dos diferentes níveis baterem. Ele é um processo após a projeção, como podemos ver na imagem abaixo.
+A Reconciliação é o método que vai fazer a soma das projeções dos diferentes níveis baterem. Ele é um processo após a projeção, como podemos ver na imagem abaixo.
 
 <p>
     <img src="https://github.com/barbosarafael/multiple-time-series-forecast/assets/44044829/1a2c4a23-e417-44cf-ad33-c4efc5c35a26" alt>
     <em>Retirado de: Hierarchical TimeSeries Reconciliation by Adrien</em>
 </p>
 
-Existem uma boa quantidade de métodos de reconciliação. Os principais são:
+Existem alguns métodos de reconciliação. Os principais são:
 
 #### BottomUp
 
@@ -126,7 +126,7 @@ As "reestimações" desse método começam a partir de algum nível intermediár
 
 #### Outras
 
-Existem outros métodos que mudam a forma a estratégia de como esse processo de "reestimação" vai acontecer e outras focadas em diminuir o erro. Algumas delas são:
+Existem outros métodos que mudam a estratégia de como esse processo de "reestimação" vai acontecer e outras focadas em diminuir o erro. Algumas delas são:
 
 - OptimalCombination
 - MinTrace
@@ -144,11 +144,11 @@ Apenas alguns highlights:
 - Vestimentas de mulheres são os itens mais vendidos (11.283.595)
 - SouthCentral é a região/regional com maior quantidade de vendas (4.792.847)
 - Tennessee/womens_clothing/SouthCentral foi a combinação (variáveis region/state/item) que teve mais vendas durante o período 
-- Tendência nas no aumento das vendas no varejo, perceptível a partir dos anos 2000 (ver imagem abaixo)
+- Tendência no aumento das vendas no varejo, perceptível a partir dos anos 2000 (ver imagem abaixo)
 
 ![image](https://github.com/barbosarafael/multiple-time-series-forecast/assets/44044829/5bb81ca3-3402-4207-825e-9f7a137b3da5)
 
-Dentro da pasta [01-explorations](https://github.com/barbosarafael/multiple-time-series-forecast/tree/main/02-notebooks/01-explorations) tem as análises mais detalhadas. 
+Para análise mais detalhadas, ver os notebooks da pasta [01-explorations](https://github.com/barbosarafael/multiple-time-series-forecast/tree/main/02-notebooks/01-explorations).
 
 ## 4. Processo de modelagem
 
@@ -170,7 +170,7 @@ df = df\
                        'quantity': 'y'})
 ```
 
-A segunda modificação é o formato dos dados. Para isso, vamos utilizar a função aggregate. Ela exige dois parâmetros: um dataframe com os dados (ver print acima) e uma lista de lista das hierarquias `[['region'], ['region', 'state'], ['region', 'state', 'item']]`. 
+A segunda modificação é o formato dos dados. Para isso, vamos utilizar a função `aggregate`. Ela exige dois parâmetros: um dataframe com os dados (ver print acima) e uma lista de lista das hierarquias `[['region'], ['region', 'state'], ['region', 'state', 'item']]`. 
 
 Criei uma função para deixar isso de forma mais simples. 
 
@@ -205,8 +205,8 @@ Ela retorna 3 objetos.
 
 Sem muito rodeio aqui:
 
-- Treino: 25/11/1997 a 31/12/2008
-- Validação: 01/01/2009 a 28/07/2009 (quase 8 meses)
+- **Treino**: 25/11/1997 a 31/12/2008
+- **Validação**: 01/01/2009 a 28/07/2009 (quase 8 meses)
 
 Teremos um **Y_train_df** e um **Y_valid_df**.
 
@@ -253,7 +253,7 @@ No fim ele mostra somente o seguinte output:
 StatsForecast(models=[Naive,AutoARIMA,HoltWinters,AutoETS])
 ```
 
-> Um adendo aqui, na documentação da lib, eles aceitam dataframes do Pandas, Spark, Dask e Ray. Li em algum local que estão começando a desenvolver para aceitar em Polars também.
+> Na documentação da lib, eles aceitam dataframes do Pandas, Spark, Dask e Ray. Li em algum local que estão começando a desenvolver para aceitar em Polars também.
 
 #### Machine Learning
 
@@ -271,7 +271,7 @@ E salvei os hiperparâmetros na pasta [03-best-params](https://github.com/barbos
 Já que estamos falando de modelos de ML, podemos adicionar novas features para melhorar (ou não) o desempenho do modelo. Em séries temporais, as mais comuns são features que extraímos da data, como o dia da semana, dia do ano, semana do ano e etc, para identificar sazonalidade, tendência e padrões de datas anteriores. No `MLForecast` existe um parâmetro que você passa quais dessas features você deseja e ele mesmo extrai, em vez de ter que criar "na mão" com o Pandas. 
 
 ```python
-date_features = ['dayofweek', 'month', 'year', 'quarter', 'day', 'week'] # Features de data`
+date_features = ['dayofweek', 'month', 'year', 'quarter', 'day', 'week'] # Features de data
 ```
 
 Outras features que podem ser extraídas são versões passadas da sua própria variável resposta (y), que são chamadas de *lag* ou *diff*. Que também são facilmente extraídas pelo `MLForecast`. 
@@ -381,7 +381,7 @@ Dentro do `.fit` do modelo passamos um parâmetro de `fitted = True` também, co
 
 ### 4.5. Reconciliação
 
-Com a lib `hierarchicalforecast` facilmente podemos fazer o processo de reconciliação. Lembrando que esse ŕé um processo pós-modelagem.
+Com a lib `hierarchicalforecast` facilmente podemos fazer o processo de reconciliação. Lembrando que esse é um processo pós-modelagem.
 
 ```python
 
@@ -427,7 +427,7 @@ Primeiramente adicionamos em uma lista todos os métodos de reconciliação que 
 
 Agora, com os métodos de reconciliação, temos 151 modelos diferentes que podemos analisar para identificar qual se aproxima mais das vendas realizadas. 
 
-> Estava trocando ideia com um coordenador de dados do da firma sobre esse projeto e ele fez a seguinte provocação: "O BottomUp se dá melhor nos menores níveis?". Não soube responder. Vendo os resultados aqui, vejo que não necessariamente.
+> Estava trocando ideia com um coordenador de dados da firma sobre esse projeto e ele fez a seguinte provocação: "O BottomUp se dá melhor nos menores níveis?". Não soube responder. Vendo os resultados aqui, vejo que não necessariamente.
 
 ## 5. Avaliação dos modelos
 
@@ -439,7 +439,7 @@ Das métricas convencionais, iremos utilizar o RMSE.
 
 ![Alt text](https://miro.medium.com/v2/resize:fit:966/1*lqDsPkfXPGen32Uem1PTNg.png)
 
-Métrica clássica de problemas de regressão dentro do Machine Learning e Estatística. A intuição por trás dele é: a média dos erros do seu modelo, em comparação com o que foi realizado. 
+Métrica clássica de problemas de regressão dentro do Machine Learning e Estatística. A intuição por trás dele é: a média dos erros do seu modelo, em comparação com o que foi realizado. Onde a unidade é a mesma que a sua variável resposta.
 
 Para o nosso contexto, isso significa que esses erros serão avaliados calculados nos dias dos nossos dados de validação, entre 01/01/2009 a 28/07/2009. 
 
@@ -463,7 +463,7 @@ evaluation = evaluator.evaluate(
 
 ![Alt text](04-images/image-9.png)
 
-Com isso, o nosso objeto `evaluation` tem uma carinha parecida com o dataframe da imagem acima. Ele calcula o RMSE por nível e também geral para cada modelo.
+Com isso, o nosso objeto `evaluation` tem uma carinha parecida com o dataframe da imagem acima. Ele calcula o RMSE por nível e também geral para cada modelo. 
 
 Para ficar mais fácil identificar quais os melhores modelos, i.e, os que tem menor RMSE, criei esses dois gráficos.
 
@@ -479,7 +479,7 @@ Uma comparação mais "olhométrica", iremos ver como as projeções estão se c
 
 #### Séries Temporais
 
-Aqui separei o resultado de um dos melhores modelos de Séries Temporais: AutoARIMA/BottomUp. Caso quiser mudar, bastaria mudar no parâmetro `models`. 
+Aqui separei o resultado de um dos melhores modelos de Séries Temporais: AutoARIMA/BottomUp. Caso queira mudar o modelo, modifique o parâmetro `models`. 
 
 As visualizações são dos maiores níveis, por default. Vemos que os resultados estão bem ruins, pois ele está basicamente projetando valores iguais, constantes. Logo, não é um bom modelo, apesar do RMSE.
 
@@ -516,12 +516,9 @@ plot_series(
 
 Temos uma variabilidade nas projeções, diferente dos modelos de Séries Temporais, mas precisaríamos olhar com mais calma as projeções dos demais. 
 
-
 #### Opinião do autor
 
-Os principais métodos já descrevi, talvez não tenhamos os melhores resultados. Show de bola! Para o seu contexto, caso siga esses passos, identifique quais são os seus principais IDs. 
-
-Isto é, quais são suas combinações mais importantes para que você consiga entender se o seu modelo está projetando bem ou não. 
+Os principais métodos já descrevi, talvez não tenhamos os melhores resultados. Para o seu contexto, caso siga esses passos, identifique quais são as combinações mais importantes, pode ser a que gera mais vendas, e verique como os modelos vem desempenhando nelas. 
 
 ## 6. Tabela final
 
@@ -569,9 +566,9 @@ O que fizemos aqui:
 
 ## 7. Bônus: Feature importance para os modelos de Machine Learning
 
-No [artigo](https://mariofilho.com/como-prever-series-temporais-com-scikit-learn/#import%C3%A2ncia-das-features) do Mario Filho, ele também ensina a extrair a feature importance dos modelos de Machine Learning. 
+No [artigo](https://mariofilho.com/como-prever-series-temporais-com-scikit-learn/#import%C3%A2ncia-das-features) do Mario Filho, ele ensina a extrair a feature importance dos modelos de Machine Learning. 
 
-Vale lembrar aqui que cada modelo tem suas particularidades de feature importance. Por exemplo, o Random Forest mede a feature importance a partir da impureza, quanto mais alto a impureza da variável, maior a importância (gini). 
+Vale lembrar aqui que cada modelo tem suas particularidades de feature importance. Por exemplo, o Random Forest mede a partir da impureza, quanto mais alto a impureza da variável, maior a importância (gini). 
 
 Já o XGBoost tem 5 métodos diferentes para medir, depende do seu ponto de vista qual utilizar. Mas por padrão utiliza o `weight`, que rankeia as features a partir da quantidade de vezes que elas foram utilizadas para dividir os dados.
 
@@ -601,11 +598,44 @@ for mod in list(model.models_.keys()):
 
 ![Alt text](04-images/image-14.png)
 
-Um print da feature importance do LGBM. Na qual apontou que as features mais importantes foram a `lag1`, `dia da seman` e o `dia`.
+Um print da feature importance do LGBM. Na qual apontou que as features mais importantes foram a `lag1`, `dia da semana` e o `dia`.
 
-## 8. Modelo em produção (TO-DO)
+## 8. Modelo em produção: 
 
-- Por enquanto, tudo está salvo na pasta [05-prd](https://github.com/barbosarafael/multiple-time-series-forecast/tree/main/05-prd).
+**Link:** https://huggingface.co/spaces/barbosarafael/multiple-time-series-forecast. Caso o app não esteja ligado, pode liga-lo.  
+
+Simulei adicionar esse modelo em produção, diretamente no Spaces do [Hugging Face](https://huggingface.co/spaces), juntamente com o `gradio`. Você pode conferir os arquivos na pasta [05-prd](https://github.com/barbosarafael/multiple-time-series-forecast/tree/main/05-prd).
+
+Temos 3 arquivos principais para fazer o deploy: `requirements.txt`, `functions.py` e `app.py`
+
+#### requirements.txt
+
+O requirements é um arquivo de texto com as bibliotecas e suas versões que utilizei nesse projeto. Ele é útil para você ter o exato mesmo ambiente de desenvolvimento que eu tinha quando estava desenvolvendo esse projeto. Tudo começa aqui, não pular para as outras etapas antes de instalar as libs.
+
+ADICIONAR IMAGEM
+
+Para instalar essas bibliotecas de uma única vez, utilize: `pip install -r requirements.txt`.
+
+#### functions.py
+
+Contém todos os carregamentos das libs que utilizei e a criação das funções que serão aplicadas no script principal. Essas funções são:
+
+1. Leitura dos dados
+2. Limpeza dos dados
+3. Organiza os dados de forma hierarquica
+4. Aplica os modelos de séries temporais
+5. Aplica os modelos de machine learning
+6. Limpeza dos dados, após a aplicação dos modelos
+
+ADICIONAR IMAGEM
+
+#### app.py
+
+Script principal que carrega as funções do `functions.py` e cria um front-end simples para o deploy no Hugging Face. 
+
+Inicialmente lemos os dados. Logo após, crio uma função de `predict`, onde o único argumento dessa função é a quantidade de dias para projeção. E output é um dataframe com as projeções.
+
+ADICIONAR IMAGEM
 
 ## 9. Referências
 
@@ -617,8 +647,9 @@ Um print da feature importance do LGBM. Na qual apontou que as features mais imp
 - **Nixtla/hierarchicalforecast**: https://github.com/Nixtla/hierarchicalforecast
 
 
-## 10. Possíveis melhorias (para outras pessoas): 
+## 10. Melhorias e aprendizados: 
 
 - Extrair features de feriados: isso ainda não é possível pela lib
 - Adicionar os intervalos de confiança
 - Modelar com alguma transformação: como box-cox ou raiz quadrada
+- Variáveis com muitas categorias são extremamente detratoras no passo de Reconciliação: computacionalmente custoso.
