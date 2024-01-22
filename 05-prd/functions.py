@@ -25,6 +25,10 @@ from window_ops.rolling import rolling_mean
 from hierarchicalforecast.methods import BottomUp, OptimalCombination
 from hierarchicalforecast.core import HierarchicalReconciliation
 
+# Gradio
+
+import gradio as gr
+
 
 #------- Funções:
 
@@ -177,7 +181,7 @@ def apply_models(Y_df: pd.DataFrame,
     return result_df
 
 
-def clean_recommendations(df_rec: pd.DataFrame):
+def clean_recommendations(df_rec: pd.DataFrame, cols_hierarchical: list):
 
     model_col = [col for col in df_rec.columns if '/' in col]
 
